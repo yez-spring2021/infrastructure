@@ -7,44 +7,6 @@ terraform {
   }
 }
 
-variable "region" {
-  type = string
-  default = "us-east-1"
-}
-
-variable "profile" {
-  type = string
-  default = "dev"
-}
-
-// variable "vpc_id" {
-//   type = string
-// }
-
-
-// CIDR blocks
-variable "cidr_block_22" {
-  type = string
-  default = "0.0.0.0/0"
-}
-
-variable "cidr_block_80" {
-  type = string
-  default = "0.0.0.0/0"
-}
-variable "cidr_block_443" {
-  type = string
-  default = "0.0.0.0/0"
-}
-variable "cidr_block_8888" {
-  type = string
-  default = "0.0.0.0/0"
-}
-variable "cidr_block_3306" {
-  type = string
-  default = "0.0.0.0/0"
-}
-
 provider "aws" {
   profile = var.profile
   region  = var.region
@@ -86,11 +48,11 @@ resource "aws_security_group" "allow_tls" {
   }
 
   ingress {
-    description = "PORT 8888"
-    from_port   = 8888
-    to_port     = 8888
+    description = "PORT 8080"
+    from_port   = 8080
+    to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = [var.cidr_block_8888]
+    cidr_blocks = [var.cidr_block_8080]
   }
 
 
