@@ -7,26 +7,6 @@ terraform {
   }
 }
 
-variable "region" {
-  type = string
-  default = "us-east-1"
-}
-
-variable "profile" {
-  type = string
-  default = "dev"
-}
-
-variable "bucket_name" {
-  type = string
-  default = "webapp.zhenyu.ye"
-}
-
-variable "iam_user" {
-  type = string
-  default = "dev"
-}
-
 provider "aws" {
   profile = var.profile
   region  = var.region
@@ -63,36 +43,3 @@ resource "aws_s3_bucket" "s3_bucket" {
     }
   }
 }
-
-data "aws_iam_user" "selected" {
-  user_name = var.iam_user
-}
-
-// // IAM Policy for S3 bucket
-// resource "aws_s3_bucket_policy" "bucket_policy" {
-//   bucket = aws_s3_bucket.s3_bucket.id
-//   policy = <<POLICY
-// {
-//     "Version": "2012-10-17",
-//     "Id": "Policy1488494182833",
-//     "Statement": [
-//         {
-//             "Sid": "Stmt1488493308547",
-//             "Effect": "Allow",
-//             "Principal": {
-//                 "AWS": "${data.aws_iam_user.selected.arn}"
-//             },
-//             "Action": [
-//                 "s3:ListBucket",
-//                 "s3:ListBucketVersions",
-//                 "s3:GetBucketLocation",
-//                 "s3:Get*",
-//                 "s3:Put*",
-//                 "s3:Delete*"
-//             ],
-//             "Resource": "arn:aws:s3:::${var.bucket_name}"
-//         }
-//     ]
-// }
-// POLICY
-// }

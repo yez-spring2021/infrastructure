@@ -7,38 +7,6 @@ terraform {
   }
 }
 
-variable "region" {
-  type = string
-  default = "us-east-1"
-}
-
-variable "profile" {
-  type = string
-  default = "dev"
-}
-
-variable "bucket_name" {
-  type = string
-  default = "webapp.zhenyu.ye"
-}
-
-variable "realm" {
-  type = string
-  default = "dev"
-}
-
-variable "cred_vars" {
-  type = map(string)
-
-  default = {
-    "username" = "csye6225"
-    "password" = "Cloud456!"
-    "name" = "csye6225"
-    "identifier" = "csye6225"
-    "key_name" = "csye6225"
-  }
-}
-
 provider "aws" {
   profile = var.profile
   region  = var.region
@@ -76,12 +44,8 @@ data "aws_s3_bucket" "s3_bucket" {
   bucket = var.bucket_name
 }
 
-data "aws_iam_role" "ec2_role" {
-  name = "EC2-CSYE6225"
-}
-
 data "aws_iam_instance_profile" "ec2_profile" {
-  name = "csye6225_profile"
+  name = var.ec2_profile_name
 }
 
 resource "aws_instance" "ec2_instance" {
@@ -96,15 +60,18 @@ resource "aws_instance" "ec2_instance" {
   user_data = <<EOF
 #!/bin/bash
 echo "User Data:"
-sudo touch .env\n
-sudo echo "MYSQL_USERNAME=${var.cred_vars["username"]}" >> /etc/environment
-sudo echo "MYSQL_PASSWORD=${var.cred_vars["password"]}" >> /etc/environment
-sudo echo "MYSQL_HOSTNAME=${data.aws_db_instance.csye6225_rds.address}" >> /etc/environment
-sudo echo "S3_BUCKET_NAME=${data.aws_s3_bucket.s3_bucket.bucket}" >> /etc/environment
-sudo echo "MYSQL_ENDPOINT=${data.aws_db_instance.csye6225_rds.endpoint}" >> /etc/environment
-sudo echo "RDS_DB_NAME=${data.aws_db_instance.csye6225_rds.db_name}" >> /etc/environment
-sudo echo "EC2_PROFILE_NAME=${data.aws_iam_instance_profile.ec2_profile.name}" >> /etc/environment
-sudo echo "REALM=${var.realm}" >> /etc/environment
+sudo systemctl stop tomcat
+echo "#!/bin/sh" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export MYSQL_USERNAME=${var.cred_vars["username"]}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export MYSQL_PASSWORD=${var.cred_vars["password"]}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export MYSQL_HOSTNAME=${data.aws_db_instance.csye6225_rds.address}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export S3_BUCKET_NAME=${data.aws_s3_bucket.s3_bucket.bucket}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export MYSQL_ENDPOINT=${data.aws_db_instance.csye6225_rds.endpoint}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export RDS_DB_NAME=${data.aws_db_instance.csye6225_rds.db_name}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export EC2_PROFILE_NAME=${data.aws_iam_instance_profile.ec2_profile.name}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export REALM=${var.realm}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo chmod +x /opt/tomcat/latest/bin/setenv.sh
+sudo systemctl start tomcat
    EOF
 
 
