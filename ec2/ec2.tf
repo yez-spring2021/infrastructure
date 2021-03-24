@@ -50,7 +50,7 @@ data "aws_iam_instance_profile" "ec2_profile" {
 
 resource "aws_instance" "ec2_instance" {
   ami = data.aws_ami.ami.id
-  instance_type = "t2.micro"
+  instance_type = "t2.small"
   associate_public_ip_address = true
   subnet_id = data.aws_subnet.ec2_subnet.id
   key_name = var.cred_vars["key_name"]
@@ -72,6 +72,12 @@ sudo echo "export EC2_PROFILE_NAME=${data.aws_iam_instance_profile.ec2_profile.n
 sudo echo "export REALM=${var.realm}" >> /opt/tomcat/latest/bin/setenv.sh
 sudo chmod +x /opt/tomcat/latest/bin/setenv.sh
 sudo systemctl start tomcat
+
+echo "Redirect 80 to 8080 and 443 to 8443"
+sudo /sbin/iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
+sudo /sbin/iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8443
+sudo /sbin/service iptables save
+sudo /etc/init.d/iptables restart
    EOF
 
 
@@ -83,4 +89,17 @@ sudo systemctl start tomcat
    tags = {
      Name = "application-csye6225"
    }
+}
+
+data "aws_route53_zone" "webapp_route53_hosted_zone" {
+  name         = var.domain_name
+  private_zone = false
+}
+
+resource "aws_route53_record" "www" {
+  zone_id = data.aws_route53_zone.webapp_route53_hosted_zone.zone_id
+  name    = var.domain_name
+  type    = "A"
+  ttl     = "60"
+  records = [aws_instance.ec2_instance.public_ip]
 }
