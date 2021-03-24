@@ -290,3 +290,9 @@ resource "aws_codedeploy_deployment_group" "csye6225-webapp-deployment" {
     }
   }
 }
+
+# attach cloudwatch policy
+resource "aws_iam_role_policy_attachment" "CloudWatchAgentServerPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  role       = aws_iam_role.CodeDeployEC2ServiceRole.name
+}
