@@ -34,3 +34,8 @@ variable "ec2_profile_name" {
   type = string
   default = "ec2_profile"
 }
+
+variable "domain_name" {
+  type = string
+  default = "dev.zhenyuye.me"
+}
