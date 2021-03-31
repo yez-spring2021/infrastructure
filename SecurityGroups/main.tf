@@ -25,21 +25,6 @@ resource "aws_security_group" "allow_tls" {
   vpc_id      = data.aws_vpc.vpc.id
 
   ingress {
-    description = "HTTPS from VPC"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [var.cidr_block_443]
-  }
-
-  ingress {
-    description = "HTTP from VPC"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [var.cidr_block_80]
-  }
-  ingress {
     description = "SSH from VPC"
     from_port   = 22
     to_port     = 22
@@ -52,9 +37,9 @@ resource "aws_security_group" "allow_tls" {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = [var.cidr_block_8080]
+    security_groups = [aws_security_group.loadbalancer_security_group.id]
   }
-
+  
 
   egress {
     from_port   = 0
@@ -85,5 +70,38 @@ resource "aws_security_group" "database_security_group" {
 
     tags = {
     Name = "database_security_group"
+  }
+}
+
+resource "aws_security_group" "loadbalancer_security_group" {
+  name        = "loadbalancer_security_group"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = data.aws_vpc.vpc.id
+
+  ingress {
+    description = "HTTPS from VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.cidr_block_443]
+  }
+
+  ingress {
+    description = "HTTP from VPC"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.cidr_block_80]
+  }
+
+  egress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "loadbalancer_security_group"
   }
 }

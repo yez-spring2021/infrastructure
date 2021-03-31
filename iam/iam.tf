@@ -259,38 +259,6 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 }
 
 
-//codedeploy app
-resource "aws_codedeploy_app" "csye6225-webapp" {
-  compute_platform = "Server"
-  name             = "csye6225-webapp"
-}
-
-//codedeploy group
-resource "aws_codedeploy_deployment_group" "csye6225-webapp-deployment" {
-  app_name              = aws_codedeploy_app.csye6225-webapp.name
-  deployment_group_name = "csye6225-webapp-deployment"
-  service_role_arn      = aws_iam_role.CodeDeployServiceRole.arn
-  deployment_config_name = "CodeDeployDefault.AllAtOnce"
-
-  deployment_style {
-    deployment_option = "WITHOUT_TRAFFIC_CONTROL"
-    deployment_type   = "IN_PLACE"
-  }
-
-  auto_rollback_configuration {
-    enabled = true
-    events  = ["DEPLOYMENT_FAILURE"]
-  }
-
-  ec2_tag_set {
-    ec2_tag_filter {
-      key   = "Name"
-      type  = "KEY_AND_VALUE"
-      value = "application-csye6225"
-    }
-  }
-}
-
 # attach cloudwatch policy
 resource "aws_iam_role_policy_attachment" "CloudWatchAgentServerPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
