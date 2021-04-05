@@ -39,3 +39,13 @@ variable "domain_name" {
   type = string
   default = "dev.zhenyuye.me"
 }
+
+variable "serverless_bucketname" {
+  type = string
+  default = "serverless.dev.zhenyuye.me"
+}
+
+variable "email_source" {
+  type = string
+  default = "webapp@dev.zhenyuye.me"
+}

@@ -17,3 +17,8 @@ variable "iam_user" {
   type = string
   default = "dev"
 }
+
+variable "serverless_bucketname" {
+  type = string
+  default = "serverless.dev.zhenyuye.me"
+}
