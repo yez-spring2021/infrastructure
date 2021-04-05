@@ -95,6 +95,11 @@ resource "aws_lb_target_group" "webapp-target-group" {
   port = 8080
   protocol = "HTTP"
   vpc_id = data.aws_vpc.vpc.id
+  health_check {
+    port = 8080
+    matcher = 200
+    path = "/books"
+  }
 }
 
 //Load Balancer Listener
@@ -134,7 +139,9 @@ sudo echo "export S3_BUCKET_NAME=${data.aws_s3_bucket.s3_bucket.bucket}" >> /opt
 sudo echo "export MYSQL_ENDPOINT=${data.aws_db_instance.csye6225_rds.endpoint}" >> /opt/tomcat/latest/bin/setenv.sh
 sudo echo "export RDS_DB_NAME=${data.aws_db_instance.csye6225_rds.db_name}" >> /opt/tomcat/latest/bin/setenv.sh
 sudo echo "export EC2_PROFILE_NAME=${data.aws_iam_instance_profile.ec2_profile.name}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export SNS_TOPIC=${aws_sns_topic.webapp_sns_topic.arn}" >> /opt/tomcat/latest/bin/setenv.sh
 sudo echo "export REALM=${var.realm}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export DOMAIN_NAME=${var.domain_name}" >> /opt/tomcat/latest/bin/setenv.sh
 sudo chmod +x /opt/tomcat/latest/bin/setenv.sh
 sudo systemctl start tomcat
    EOF
