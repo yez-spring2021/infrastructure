@@ -253,7 +253,7 @@ resource "aws_codedeploy_deployment_group" "csye6225-webapp-deployment" {
   app_name              = aws_codedeploy_app.csye6225-webapp.name
   deployment_group_name = "csye6225-webapp-deployment"
   service_role_arn      = data.aws_iam_role.CodeDeployServiceRole.arn
-  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+  deployment_config_name = "CodeDeployDefault.OneAtATime"
   autoscaling_groups = [aws_autoscaling_group.asg.name]
   load_balancer_info {
     target_group_info {
@@ -261,7 +261,7 @@ resource "aws_codedeploy_deployment_group" "csye6225-webapp-deployment" {
     }
   }
   deployment_style {
-    deployment_option = "WITHOUT_TRAFFIC_CONTROL"
+    deployment_option = "WITH_TRAFFIC_CONTROL"
     deployment_type   = "IN_PLACE"
   }
 
