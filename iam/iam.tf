@@ -290,6 +290,11 @@ resource "aws_iam_role_policy_attachment" "AWSCodeDeployLambdaRole" {
   role       = aws_iam_role.CodeDeployLambdaServiceRole.name
 }
 
+resource "aws_iam_role_policy_attachment" "AWSCodeDeployRoleForLambda" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForLambda"
+  role       = aws_iam_role.CodeDeployLambdaServiceRole.name
+}
+
 resource "aws_iam_role_policy_attachment" "AWSCodeDeployLambdaRoleWithS3" {
   policy_arn = aws_iam_policy.CodeDeploy_serverless_policy.arn
   role       = aws_iam_role.CodeDeployLambdaServiceRole.name

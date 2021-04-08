@@ -68,5 +68,5 @@ resource "aws_lambda_alias" "lambda_alias" {
   name             = "sendEmail"
   description      = "alias for sendEmail"
   function_name    = aws_lambda_function.webapp_lambda.function_name
-  function_version = "1"
+  function_version = aws_lambda_function.webapp_lambda.version
 }
