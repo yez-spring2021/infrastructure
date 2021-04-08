@@ -62,6 +62,7 @@ resource "aws_lambda_permission" "lambda_sns_permission" {
   function_name = aws_lambda_function.webapp_lambda.function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.webapp_sns_topic.arn
+  qualifier     = aws_lambda_alias.lambda_alias.name
 }
 
 resource "aws_lambda_alias" "lambda_alias" {
