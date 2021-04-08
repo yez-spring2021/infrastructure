@@ -52,6 +52,7 @@ resource "aws_lambda_function" "webapp_lambda" {
     variables = {
       Name = "Lambda Function"
       EMAIL_SOURCE = var.email_source
+      DOMAIN_NAME = var.domain_name
     }
   }
 }
