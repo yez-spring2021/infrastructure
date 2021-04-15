@@ -79,3 +79,8 @@ terraform apply -var-file="./variables.tfvars"
 ```
 terraform destroy -var-file="./variables.tfvars" 
 ```
+
+### import certificate
+```
+aws acm import-certificate --certificate fileb://prod_zhenyuye.me/prod_zhenyuye_me.crt --certificate-chain fileb://prod_zhenyuye.me/prod_zhenyuye_me.ca-bundle --private-key fileb://prodzhenyuyeme.key --profile prod
+```

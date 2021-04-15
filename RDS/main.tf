@@ -50,6 +50,7 @@ resource "aws_db_parameter_group" "db_params_group" {
   }
 }
 
+
 data "aws_rds_certificate" "rdscert" {
   latest_valid_till = true
 }
@@ -72,6 +73,7 @@ resource "aws_db_instance" "csye6225_rds" {
   storage_encrypted = true
   parameter_group_name = aws_db_parameter_group.db_params_group.name
   ca_cert_identifier = data.aws_rds_certificate.rdscert.id
+  kms_key_id = aws_kms_key.rds_kms_key.arn
 }
 
 resource "aws_db_instance" "test" {
@@ -91,4 +93,16 @@ resource "aws_db_instance" "test" {
   storage_encrypted = true
   parameter_group_name = aws_db_parameter_group.db_params_group.name
   ca_cert_identifier = data.aws_rds_certificate.rdscert.id
+  kms_key_id = aws_kms_key.rds_kms_key.arn
+}
+
+resource "aws_kms_key" "rds_kms_key" {
+  description             = "KMS key for RDS"
+  deletion_window_in_days = 7
+  enable_key_rotation = true
+}
+
+resource "aws_kms_alias" "rds_kms_alias" {
+  name          = "alias/rds-kms-alias"
+  target_key_id = aws_kms_key.rds_kms_key.key_id
 }
