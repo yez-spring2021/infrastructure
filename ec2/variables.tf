@@ -40,6 +40,11 @@ variable "domain_name" {
   default = "dev.zhenyuye.me"
 }
 
+variable "storepass" {
+  type = string
+  default = "csye6225"
+}
+
 variable "serverless_bucketname" {
   type = string
   default = "serverless.dev.zhenyuye.me"

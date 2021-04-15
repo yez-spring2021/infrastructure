@@ -102,13 +102,20 @@ resource "aws_lb_target_group" "webapp-target-group" {
   }
 }
 
+data "aws_acm_certificate" "webapp_certificate" {
+  domain = var.domain_name
+  statuses = ["ISSUED"]
+}
+
 //Load Balancer Listener
-// forward traffic 80 to 8080
+// forward traffic 443 to 8080
 resource "aws_lb_listener" "lb_listener" {
   load_balancer_arn = aws_lb.webapp-load-balancer.arn
-  port              = "80"
-  protocol          = "HTTP"
-
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = data.aws_acm_certificate.webapp_certificate.arn
+  
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.webapp-target-group.arn
@@ -142,6 +149,9 @@ sudo echo "export EC2_PROFILE_NAME=${data.aws_iam_instance_profile.ec2_profile.n
 sudo echo "export SNS_TOPIC=${aws_sns_topic.webapp_sns_topic.arn}" >> /opt/tomcat/latest/bin/setenv.sh
 sudo echo "export REALM=${var.realm}" >> /opt/tomcat/latest/bin/setenv.sh
 sudo echo "export DOMAIN_NAME=${var.domain_name}" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export TRUST_STORE=/opt/clientkeystore.jks" >> /opt/tomcat/latest/bin/setenv.sh
+sudo echo "export TRUST_STORE_PASSWORD=${var.storepass}" >> /opt/tomcat/latest/bin/setenv.sh
+
 sudo chmod +x /opt/tomcat/latest/bin/setenv.sh
 sudo systemctl start tomcat
    EOF
@@ -155,7 +165,8 @@ sudo systemctl start tomcat
     volume_type = "gp2"
     volume_size =  20
     delete_on_termination = true
-   }
+    encrypted = true
+  }
 }
 
 resource "aws_autoscaling_group" "asg" {
@@ -261,7 +272,7 @@ resource "aws_codedeploy_deployment_group" "csye6225-webapp-deployment" {
     }
   }
   deployment_style {
-    deployment_option = "WITH_TRAFFIC_CONTROL"
+    deployment_option = "WITHOUT_TRAFFIC_CONTROL"
     deployment_type   = "IN_PLACE"
   }
 
